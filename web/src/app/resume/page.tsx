@@ -1,27 +1,26 @@
-const highlights = [
-  "Engineering management across product and platform teams",
-  "Delivered AI-enabled clinical workflow improvements",
-  "Built scalable systems with strong observability and reliability",
-];
+import fs from "node:fs/promises";
+import path from "node:path";
+import { loadProfile } from "@/lib/profile";
 
-export default function ResumePage() {
+async function loadResumeMarkdown() {
+  const resumePath = path.join(process.cwd(), "src", "content", "resume.md");
+  return fs.readFile(resumePath, "utf-8");
+}
+
+export default async function ResumePage() {
+  const profile = loadProfile();
+  const resumeMarkdown = await loadResumeMarkdown();
+
   return (
     <section>
-      <h1>Resume</h1>
+      <h1>{profile.name}</h1>
       <div className="card">
         <h2>Summary</h2>
-        <p>
-          Software Engineering Manager focused on building strong teams,
-          delivering customer value, and partnering cross-functionally.
-        </p>
+        <p>{profile.tagline}</p>
       </div>
       <div className="card">
-        <h2>Highlights</h2>
-        <ul>
-          {highlights.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <h2>Resume Content</h2>
+        <pre style={{ whiteSpace: "pre-wrap", margin: 0 }}>{resumeMarkdown}</pre>
       </div>
       <div className="card">
         <h2>Download</h2>

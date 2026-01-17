@@ -10,7 +10,7 @@ test:
 	cd web && npm run lint && npm run typecheck
 
 docker-build:
-	docker build -t personal-website:local ./web
+	docker build -t personal-website:local -f web/Dockerfile .
 
 docker-run:
 	docker run --rm -p 3000:3000 --env-file web/.env.example \

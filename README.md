@@ -15,6 +15,7 @@ This repo is the control plane for a personal website with a blog backend, infra
 - `web/`: Next.js app and API
 - `infra/`: Terraform for AWS infrastructure
 - `scripts/`: setup helpers
+- `config/`: personalization config
 - `CONTEXT.md`: running decisions and instructions
 
 ## Local Setup
@@ -48,7 +49,13 @@ Requires the AWS CLI to be installed locally.
 cp web/.env.example web/.env.local
 ```
 
-5. Run the dev server
+5. (Optional) Fetch resume content from the private repo
+
+```
+RESUME_REPO_TOKEN=... node scripts/fetch-resume.mjs
+```
+
+6. Run the dev server
 
 ```
 make dev
@@ -87,6 +94,7 @@ make docker-run
 ```
 
 `make docker-run` uses `host.docker.internal` for DynamoDB. Update the env if your Docker host differs.
+Builds use the repo root as context so `config/profile.json` is included in the image.
 
 ## Terraform
 
@@ -121,6 +129,40 @@ Required GitHub Secrets:
 - `TF_VAR_hosted_zone_id`
 - `TF_VAR_admin_token`
 - `TF_VAR_project_name` (optional)
+- `RESUME_REPO_TOKEN`
+- `RESUME_REPO_OWNER`
+- `RESUME_REPO_NAME`
+- `RESUME_REPO_README_PATH`
+- `RESUME_REPO_PDF_PATH`
+- `RESUME_REPO_REF` (optional)
+
+## Personalization
+
+Edit `config/profile.json` to set name, title, and links. These values are loaded at runtime and can be overridden via environment variables:
+
+- `PROFILE_NAME`
+- `PROFILE_TITLE`
+- `PROFILE_TAGLINE`
+- `PROFILE_LINKEDIN_URL`
+- `PROFILE_GITHUB_URL`
+Resume repo settings should live in the root `.env` (or CI secrets), not in `config/profile.json`:
+
+- `RESUME_REPO_OWNER`
+- `RESUME_REPO_NAME`
+- `RESUME_REPO_README_PATH`
+- `RESUME_REPO_PDF_PATH`
+- `RESUME_REPO_REF`
+
+The resume content is fetched in CI and written to:
+
+- `web/src/content/resume.md`
+- `web/public/resume.pdf`
+
+You can keep resume repo secrets in a root `.env` file for local runs:
+
+```
+cp .env.example .env
+```
 
 ## Customization
 

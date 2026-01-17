@@ -18,12 +18,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      - name: Fetch resume content
+        run: node scripts/fetch-resume.mjs
+        env:
+          RESUME_REPO_TOKEN: ${{ secrets.RESUME_REPO_TOKEN }}
+          RESUME_REPO_OWNER: ${{ secrets.RESUME_REPO_OWNER }}
+          RESUME_REPO_NAME: ${{ secrets.RESUME_REPO_NAME }}
+          RESUME_REPO_README_PATH: ${{ secrets.RESUME_REPO_README_PATH }}
+          RESUME_REPO_PDF_PATH: ${{ secrets.RESUME_REPO_PDF_PATH }}
+          RESUME_REPO_REF: ${{ secrets.RESUME_REPO_REF }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
@@ -44,7 +57,7 @@ jobs:
           IMAGE_TAG=${GITHUB_SHA::7}
           REPO_NAME="${TF_VAR_project_name:-personal-website}-web"
           IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
-          docker build -t "$IMAGE_URI" ./web
+          docker build -t "$IMAGE_URI" -f web/Dockerfile .
           docker push "$IMAGE_URI"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
         env:
