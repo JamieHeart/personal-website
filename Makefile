@@ -1,5 +1,10 @@
 .PHONY: setup dev test docker-build docker-run db-local db-stop tf-init tf-plan tf-apply deploy
 
+ifneq (,$(wildcard .env))
+include .env
+export
+endif
+
 setup:
 	cd web && npm install
 
