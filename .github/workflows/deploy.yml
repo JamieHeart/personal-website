@@ -12,6 +12,7 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       TF_STATE_REGION: ${{ secrets.TF_STATE_REGION }}
+      TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
       TF_VAR_domain_name: ${{ secrets.TF_VAR_domain_name }}
       TF_VAR_hosted_zone_id: ${{ secrets.TF_VAR_hosted_zone_id }}
       TF_VAR_admin_token: ${{ secrets.TF_VAR_admin_token }}
