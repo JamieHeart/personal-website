@@ -32,3 +32,4 @@ Control plane for personal website with resume, blog, and infrastructure as code
 - 2026-01-17: Removed resume repo fields from config; use root .env only.
 - 2026-01-17: Docker build now uses repo root context to include config.
 - 2026-01-17: Makefile loads root .env for Terraform variables.
+- 2026-01-17: Added remote Terraform state + import workflow to improve deploy resilience.

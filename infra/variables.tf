@@ -55,3 +55,9 @@ variable "admin_token" {
   type        = string
   sensitive   = true
 }
+
+variable "skip_cert_validation_records" {
+  description = "Skip ACM validation Route53 records (useful for importing state)"
+  type        = bool
+  default     = false
+}
