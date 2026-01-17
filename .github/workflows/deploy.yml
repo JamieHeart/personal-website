@@ -53,7 +53,7 @@ jobs:
           IMAGE_TAG=${GITHUB_SHA::7}
           REPO_NAME="${TF_VAR_project_name:-personal-website}-web"
           IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
-          docker build -t "$IMAGE_URI" ./web
+          docker build -t "$IMAGE_URI" -f web/Dockerfile .
           docker push "$IMAGE_URI"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
         env:

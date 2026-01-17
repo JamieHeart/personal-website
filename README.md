@@ -94,6 +94,7 @@ make docker-run
 ```
 
 `make docker-run` uses `host.docker.internal` for DynamoDB. Update the env if your Docker host differs.
+Builds use the repo root as context so `config/profile.json` is included in the image.
 
 ## Terraform
 

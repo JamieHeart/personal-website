@@ -19,7 +19,20 @@ export type ProfileConfig = {
 };
 
 export function loadProfile(): ProfileConfig {
-  const configPath = path.join(process.cwd(), "..", "config", "profile.json");
+  const configCandidates = [
+    path.join(process.cwd(), "config", "profile.json"),
+    path.join(process.cwd(), "..", "config", "profile.json"),
+  ];
+  const configPath = configCandidates.find((candidate) =>
+    fs.existsSync(candidate)
+  );
+
+  if (!configPath) {
+    throw new Error(
+      "Missing config/profile.json. Ensure it exists in the runtime image."
+    );
+  }
+
   const raw = fs.readFileSync(configPath, "utf-8");
   const parsed = JSON.parse(raw) as ProfileConfig;
 
