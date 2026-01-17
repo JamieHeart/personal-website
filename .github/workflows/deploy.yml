@@ -24,6 +24,15 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      - name: Fetch resume content
+        run: node scripts/fetch-resume.mjs
+        env:
+          RESUME_REPO_TOKEN: ${{ secrets.RESUME_REPO_TOKEN }}
+          RESUME_REPO_OWNER: ${{ secrets.RESUME_REPO_OWNER }}
+          RESUME_REPO_NAME: ${{ secrets.RESUME_REPO_NAME }}
+          RESUME_REPO_README_PATH: ${{ secrets.RESUME_REPO_README_PATH }}
+          RESUME_REPO_PDF_PATH: ${{ secrets.RESUME_REPO_PDF_PATH }}
+          RESUME_REPO_REF: ${{ secrets.RESUME_REPO_REF }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Init

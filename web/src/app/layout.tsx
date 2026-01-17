@@ -1,9 +1,12 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { loadProfile } from "@/lib/profile";
+
+const profile = loadProfile();
 
 export const metadata: Metadata = {
-  title: "Your Name - Engineering Leader",
-  description: "Personal site, resume, and blog.",
+  title: `${profile.name} - ${profile.title}`,
+  description: profile.tagline,
 };
 
 export default function RootLayout({
@@ -17,19 +20,19 @@ export default function RootLayout({
         <header className="site-header">
           <div className="container">
             <a className="brand" href="/">
-              Your Name
+              {profile.name}
             </a>
             <nav className="nav">
               <a href="/resume">Resume</a>
               <a href="/blog">Blog</a>
               <a
-                href="https://www.linkedin.com/in/your-linkedin"
+                href={profile.linkedinUrl}
                 target="_blank"
                 rel="noreferrer"
               >
                 LinkedIn
               </a>
-              <a href="https://github.com/your-github" target="_blank" rel="noreferrer">
+              <a href={profile.githubUrl} target="_blank" rel="noreferrer">
                 GitHub
               </a>
             </nav>
@@ -37,7 +40,9 @@ export default function RootLayout({
         </header>
         <main className="container">{children}</main>
         <footer className="site-footer">
-          <div className="container">© {new Date().getFullYear()} Your Name</div>
+          <div className="container">
+            © {new Date().getFullYear()} {profile.name}
+          </div>
         </footer>
       </body>
     </html>
