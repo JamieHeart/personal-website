@@ -22,9 +22,7 @@ Control plane for personal website with resume, blog, and infrastructure as code
 
 ## Open Questions
 
-- Confirm production domain name and hosted zone.
 - Decide whether to use RDS/Postgres instead of DynamoDB.
-- Confirm preferred CI/CD environment variables and secrets.
 
 ## Change Log
 
@@ -33,3 +31,4 @@ Control plane for personal website with resume, blog, and infrastructure as code
 - 2026-01-17: Added root .env example for resume repo secrets.
 - 2026-01-17: Removed resume repo fields from config; use root .env only.
 - 2026-01-17: Docker build now uses repo root context to include config.
+- 2026-01-17: Makefile loads root .env for Terraform variables.

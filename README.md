@@ -98,6 +98,13 @@ Builds use the repo root as context so `config/profile.json` is included in the 
 
 ## Terraform
 
+`make tf-init`, `make tf-plan`, and `make tf-apply` load root `.env` if present.
+For local runs, set:
+
+- `TF_VAR_domain_name`
+- `TF_VAR_hosted_zone_id`
+- `TF_VAR_admin_token`
+
 Initialize and plan:
 
 ```
