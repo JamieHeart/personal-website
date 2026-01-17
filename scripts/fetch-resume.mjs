@@ -60,15 +60,34 @@ async function fetchContent(filePath) {
   return response.json();
 }
 
-async function main() {
-  const readme = await fetchContent(readmePath);
-  const pdf = await fetchContent(pdfPath);
+async function fetchFileBuffer(filePath) {
+  const file = await fetchContent(filePath);
+  if (file.content && file.encoding === "base64") {
+    return Buffer.from(file.content, "base64");
+  }
+  if (file.download_url) {
+    const response = await fetch(file.download_url, { headers });
+    if (!response.ok) {
+      throw new Error(`Failed to download ${filePath}: ${response.status}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  }
+  throw new Error(`No content available for ${filePath}.`);
+}
 
-  const readmeContent = Buffer.from(readme.content, "base64").toString("utf-8");
+async function fetchFileText(filePath) {
+  const buffer = await fetchFileBuffer(filePath);
+  return buffer.toString("utf-8");
+}
+
+async function main() {
+  const readmeContent = await fetchFileText(readmePath);
   fs.mkdirSync(path.dirname(outputMarkdown), { recursive: true });
   fs.writeFileSync(outputMarkdown, readmeContent);
 
-  const pdfContent = Buffer.from(pdf.content, "base64");
+  const pdfContent = await fetchFileBuffer(pdfPath);
+  fs.mkdirSync(path.dirname(outputPdf), { recursive: true });
   fs.writeFileSync(outputPdf, pdfContent);
 
   console.log(`Wrote resume markdown to ${outputMarkdown}`);
