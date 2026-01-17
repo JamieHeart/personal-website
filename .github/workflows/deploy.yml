@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_domain_name: ${{ secrets.TF_VAR_domain_name }}
+      TF_VAR_hosted_zone_id: ${{ secrets.TF_VAR_hosted_zone_id }}
+      TF_VAR_admin_token: ${{ secrets.TF_VAR_admin_token }}
+      TF_VAR_project_name: ${{ secrets.TF_VAR_project_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infra
+      - name: Bootstrap Infra
+        run: terraform apply -auto-approve -var="image_tag=bootstrap"
+        working-directory: infra
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region "$AWS_REGION" \
+            | docker login --username AWS --password-stdin \
+              "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      - name: Build and Push Image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          REPO_NAME="${TF_VAR_project_name:-personal-website}-web"
+          IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
+          docker build -t "$IMAGE_URI" ./web
+          docker push "$IMAGE_URI"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      - name: Deploy
+        run: terraform apply -auto-approve -var="image_tag=${IMAGE_TAG}"
+        working-directory: infra

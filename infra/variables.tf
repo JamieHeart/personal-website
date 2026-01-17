@@ -1,0 +1,57 @@
+variable "project_name" {
+  description = "Project name prefix for resources"
+  type        = string
+  default     = "personal-website"
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "domain_name" {
+  description = "Full domain name for the site (e.g., example.com)"
+  type        = string
+}
+
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID for the domain"
+  type        = string
+}
+
+variable "container_port" {
+  description = "Container port for the web app"
+  type        = number
+  default     = 3000
+}
+
+variable "desired_count" {
+  description = "Number of ECS tasks"
+  type        = number
+  default     = 1
+}
+
+variable "cpu" {
+  description = "Fargate task CPU units"
+  type        = number
+  default     = 256
+}
+
+variable "memory" {
+  description = "Fargate task memory (MiB)"
+  type        = number
+  default     = 512
+}
+
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"
+}
+
+variable "admin_token" {
+  description = "Admin token for blog write access"
+  type        = string
+  sensitive   = true
+}

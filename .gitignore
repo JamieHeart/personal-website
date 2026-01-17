@@ -1,0 +1,9 @@
+node_modules
+.next
+.env
+.env.local
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
+*.log
+dist
