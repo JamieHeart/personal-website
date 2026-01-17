@@ -15,7 +15,7 @@ export type ProfileConfig = {
   tagline: string;
   linkedinUrl: string;
   githubUrl: string;
-  resumeRepo: ResumeRepoConfig;
+  resumeRepo?: ResumeRepoConfig;
 };
 
 export function loadProfile(): ProfileConfig {
@@ -30,13 +30,16 @@ export function loadProfile(): ProfileConfig {
     tagline: process.env.PROFILE_TAGLINE ?? parsed.tagline,
     linkedinUrl: process.env.PROFILE_LINKEDIN_URL ?? parsed.linkedinUrl,
     githubUrl: process.env.PROFILE_GITHUB_URL ?? parsed.githubUrl,
-    resumeRepo: {
-      ...parsed.resumeRepo,
-      owner: process.env.RESUME_REPO_OWNER ?? parsed.resumeRepo.owner,
-      repo: process.env.RESUME_REPO_NAME ?? parsed.resumeRepo.repo,
-      readmePath: process.env.RESUME_REPO_README_PATH ?? parsed.resumeRepo.readmePath,
-      pdfPath: process.env.RESUME_REPO_PDF_PATH ?? parsed.resumeRepo.pdfPath,
-      ref: process.env.RESUME_REPO_REF ?? parsed.resumeRepo.ref,
-    },
+    resumeRepo: parsed.resumeRepo
+      ? {
+          ...parsed.resumeRepo,
+          owner: process.env.RESUME_REPO_OWNER ?? parsed.resumeRepo.owner,
+          repo: process.env.RESUME_REPO_NAME ?? parsed.resumeRepo.repo,
+          readmePath:
+            process.env.RESUME_REPO_README_PATH ?? parsed.resumeRepo.readmePath,
+          pdfPath: process.env.RESUME_REPO_PDF_PATH ?? parsed.resumeRepo.pdfPath,
+          ref: process.env.RESUME_REPO_REF ?? parsed.resumeRepo.ref,
+        }
+      : undefined,
   };
 }

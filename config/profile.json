@@ -1,14 +1,7 @@
 {
-  "name": "Your Name",
+  "name": "Jamie Hartman",
   "title": "Software Engineering Leader",
   "tagline": "Building high-performing teams and scalable systems.",
-  "linkedinUrl": "https://www.linkedin.com/in/your-linkedin",
-  "githubUrl": "https://github.com/your-github",
-  "resumeRepo": {
-    "owner": "your-github",
-    "repo": "private-resume-repo",
-    "readmePath": "README.md",
-    "pdfPath": "res/resume.pdf",
-    "ref": "main"
-  }
+  "linkedinUrl": "https://www.linkedin.com/in/jamie-n-hartman/",
+  "githubUrl": "https://github.com/JamieHeart"
 }

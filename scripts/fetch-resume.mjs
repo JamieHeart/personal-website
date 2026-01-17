@@ -2,26 +2,42 @@ import fs from "node:fs";
 import path from "node:path";
 
 const rootDir = path.resolve(process.cwd());
-const profilePath = path.join(rootDir, "config", "profile.json");
+const envPath = path.join(rootDir, ".env");
 const outputMarkdown = path.join(rootDir, "web", "src", "content", "resume.md");
 const outputPdf = path.join(rootDir, "web", "public", "resume.pdf");
 
-if (!fs.existsSync(profilePath)) {
-  throw new Error("Missing config/profile.json");
+if (fs.existsSync(envPath)) {
+  const raw = fs.readFileSync(envPath, "utf-8");
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const idx = trimmed.indexOf("=");
+    if (idx === -1) continue;
+    const key = trimmed.slice(0, idx).trim();
+    let value = trimmed.slice(idx + 1).trim();
+    if (
+      (value.startsWith("\"") && value.endsWith("\"")) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) {
+      process.env[key] = value;
+    }
+  }
 }
 
-const profile = JSON.parse(fs.readFileSync(profilePath, "utf-8"));
-const resumeRepo = profile.resumeRepo ?? {};
-
-const owner = process.env.RESUME_REPO_OWNER ?? resumeRepo.owner;
-const repo = process.env.RESUME_REPO_NAME ?? resumeRepo.repo;
-const readmePath = process.env.RESUME_REPO_README_PATH ?? resumeRepo.readmePath;
-const pdfPath = process.env.RESUME_REPO_PDF_PATH ?? resumeRepo.pdfPath;
-const ref = process.env.RESUME_REPO_REF ?? resumeRepo.ref ?? "main";
+const owner = process.env.RESUME_REPO_OWNER;
+const repo = process.env.RESUME_REPO_NAME;
+const readmePath = process.env.RESUME_REPO_README_PATH;
+const pdfPath = process.env.RESUME_REPO_PDF_PATH;
+const ref = process.env.RESUME_REPO_REF ?? "main";
 const token = process.env.RESUME_REPO_TOKEN;
 
 if (!owner || !repo || !readmePath || !pdfPath) {
-  throw new Error("Resume repo config is incomplete.");
+  throw new Error(
+    "Resume repo config is incomplete. Set RESUME_REPO_* in .env or your environment."
+  );
 }
 
 if (!token) {

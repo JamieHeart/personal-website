@@ -30,3 +30,5 @@ Control plane for personal website with resume, blog, and infrastructure as code
 
 - 2026-01-17: Initialized repo structure and baseline docs.
 - 2026-01-17: Added personalization config and resume fetch workflow.
+- 2026-01-17: Added root .env example for resume repo secrets.
+- 2026-01-17: Removed resume repo fields from config; use root .env only.

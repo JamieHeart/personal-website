@@ -137,13 +137,15 @@ Required GitHub Secrets:
 
 ## Personalization
 
-Edit `config/profile.json` to set name, title, links, and resume repo info. These values are loaded at runtime and can be overridden via environment variables:
+Edit `config/profile.json` to set name, title, and links. These values are loaded at runtime and can be overridden via environment variables:
 
 - `PROFILE_NAME`
 - `PROFILE_TITLE`
 - `PROFILE_TAGLINE`
 - `PROFILE_LINKEDIN_URL`
 - `PROFILE_GITHUB_URL`
+Resume repo settings should live in the root `.env` (or CI secrets), not in `config/profile.json`:
+
 - `RESUME_REPO_OWNER`
 - `RESUME_REPO_NAME`
 - `RESUME_REPO_README_PATH`
@@ -154,6 +156,12 @@ The resume content is fetched in CI and written to:
 
 - `web/src/content/resume.md`
 - `web/public/resume.pdf`
+
+You can keep resume repo secrets in a root `.env` file for local runs:
+
+```
+cp .env.example .env
+```
 
 ## Customization
 
