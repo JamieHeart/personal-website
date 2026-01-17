@@ -118,6 +118,16 @@ Apply (deploy):
 make tf-apply
 ```
 
+Remote state is stored in S3 with DynamoDB locking. If you are importing an
+existing stack into state, run:
+
+```
+AWS_REGION=us-east-1 STATE_REGION=us-west-2 ./infra/import-existing.sh
+```
+
+`STATE_REGION` can differ from `AWS_REGION` when the state bucket lives in a
+separate region.
+
 ## CI/CD
 
 GitHub Actions will:
@@ -132,6 +142,7 @@ Required GitHub Secrets:
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_REGION`
 - `AWS_ACCOUNT_ID`
+- `TF_STATE_REGION` (state backend region, optional if same as `AWS_REGION`)
 - `TF_VAR_domain_name`
 - `TF_VAR_hosted_zone_id`
 - `TF_VAR_admin_token`
