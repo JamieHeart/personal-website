@@ -11,6 +11,15 @@ type BlogPost = {
   updatedAt?: string;
 };
 
+function isConditionalCheckFailed(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    (error as { name?: string }).name === "ConditionalCheckFailedException"
+  );
+}
+
 function normalizePost(input: Partial<BlogPost>): BlogPost {
   if (!input.slug || !input.title || !input.excerpt || !input.content) {
     throw new Error("invalid_payload");
@@ -72,12 +81,23 @@ export async function POST(request: Request) {
     return new Response("Invalid post payload", { status: 400 });
   }
 
-  await docClient.send(
-    new PutCommand({
-      TableName: blogTableName,
-      Item: post,
-    })
-  );
+  try {
+    await docClient.send(
+      new PutCommand({
+        TableName: blogTableName,
+        Item: post,
+        ConditionExpression: "attribute_not_exists(#slug)",
+        ExpressionAttributeNames: {
+          "#slug": "slug",
+        },
+      })
+    );
+  } catch (error) {
+    if (isConditionalCheckFailed(error)) {
+      return new Response("Slug already exists", { status: 409 });
+    }
+    throw error;
+  }
 
   return Response.json(post, { status: 201 });
 }

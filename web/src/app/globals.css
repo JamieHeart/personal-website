@@ -152,3 +152,144 @@ a {
   border-top: 1px solid #1f2937;
   margin: 24px 0;
 }
+
+.admin {
+  margin-top: 32px;
+}
+
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.admin-row input {
+  flex: 1;
+}
+
+.admin-form {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.admin-form input,
+.admin-form textarea {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.admin-form button {
+  background: #2563eb;
+  color: #f8fafc;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-help {
+  color: #94a3b8;
+  margin-top: 8px;
+}
+
+.admin-status {
+  color: #a7f3d0;
+}
+
+.status-message {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 14px;
+}
+
+.status-info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #bfdbfe;
+}
+
+.status-warning {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.4);
+  color: #fde68a;
+}
+
+.status-error {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+}
+
+.admin-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.admin-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #1f2937;
+}
+
+.admin-list-item:last-child {
+  border-bottom: none;
+}
+
+.admin-meta {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-actions button {
+  background: transparent;
+  border: 1px solid #1f2937;
+  color: #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-actions .danger {
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+.post-date {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-top: 4px;
+}
