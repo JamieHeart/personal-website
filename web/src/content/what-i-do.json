@@ -1,0 +1,15 @@
+{
+  "readmeHash": "a98a5e1e8c96115e11948deab4c77affca0213a696b77e2e6d50334022673c7d",
+  "model": "gpt-5-mini",
+  "generatedAt": "2026-01-18T17:11:34.240Z",
+  "title": "Director of Software Engineering",
+  "tagline": "Director-level engineering leader who builds high-performing teams and delivers reliable, cloud-native platforms that align with business strategy.",
+  "whatIDo": "Seasoned engineering leader with 21+ years in software development and 5+ years leading multi-team organizations. I drive enterprise platform and product initiatives—translating business strategy into durable technical roadmaps—focusing on cloud-native, API-first microservices and enterprise-grade reliability. I establish operating rhythms and modern SDLC/CI-CD practices, partner across product, security, and operations, and develop managers and engineers to deliver measurable outcomes such as cost reductions, improved throughput, and higher service reliability.",
+  "featured": [
+    "Lead multi-team engineering organizations to deliver enterprise platform roadmaps",
+    "Design and operate cloud-native, API-first microservices with enterprise reliability",
+    "Align cross-functional stakeholders and translate strategy into technical delivery",
+    "Build and coach managers and engineers; scale hiring and inclusive culture",
+    "Drive measurable outcomes: cost savings, SDLC improvements, and platform reliability"
+  ]
+}
