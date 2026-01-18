@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import StatusMessage, { type StatusVariant } from "@/components/StatusMessage";
 import {
   mergeGeneratedFields,
@@ -61,18 +61,21 @@ export default function AdminPostsPage() {
     return result;
   }, [token]);
 
-  function setStatusMessage(message: string, variant: StatusVariant = "info") {
-    setStatus({ message, variant });
-  }
+  const setStatusMessage = useCallback(
+    (message: string, variant: StatusVariant = "info") => {
+      setStatus({ message, variant });
+    },
+    []
+  );
 
-  function setSlugStatusMessage(
-    message: string,
-    variant: StatusVariant = "info"
-  ) {
-    setSlugStatus({ message, variant });
-  }
+  const setSlugStatusMessage = useCallback(
+    (message: string, variant: StatusVariant = "info") => {
+      setSlugStatus({ message, variant });
+    },
+    []
+  );
 
-  async function loadPosts() {
+  const loadPosts = useCallback(async () => {
     try {
       const res = await fetch("/api/posts", { cache: "no-store" });
       if (!res.ok) {
@@ -84,11 +87,11 @@ export default function AdminPostsPage() {
     } catch {
       setStatusMessage("Failed to load posts.", "error");
     }
-  }
+  }, [setStatusMessage]);
 
   useEffect(() => {
     loadPosts();
-  }, []);
+  }, [loadPosts]);
 
   function updateForm<K extends keyof BlogPost>(key: K, value: BlogPost[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -123,7 +126,7 @@ export default function AdminPostsPage() {
     }
   }
 
-  async function checkSlugConflict(slug: string): Promise<boolean> {
+  const checkSlugConflict = useCallback(async (slug: string): Promise<boolean> => {
     const normalized = slug.trim();
     if (!normalized) {
       setSlugStatus(null);
@@ -150,7 +153,7 @@ export default function AdminPostsPage() {
     } finally {
       setSlugChecking(false);
     }
-  }
+  }, [setSlugStatusMessage]);
 
   useEffect(() => {
     if (isEditing) {
@@ -166,7 +169,7 @@ export default function AdminPostsPage() {
       void checkSlugConflict(slug);
     }, 500);
     return () => window.clearTimeout(handle);
-  }, [form.slug, isEditing]);
+  }, [checkSlugConflict, form.slug, isEditing]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
