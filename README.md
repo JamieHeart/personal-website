@@ -153,6 +153,8 @@ Required GitHub Secrets:
 - `RESUME_REPO_README_PATH`
 - `RESUME_REPO_PDF_PATH`
 - `RESUME_REPO_REF` (optional)
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` (optional, defaults to `gpt-4o` in CI and `gpt-4o-mini` locally)
 
 ## Personalization
 
@@ -170,6 +172,8 @@ Resume repo settings should live in the root `.env` (or CI secrets), not in `con
 - `RESUME_REPO_README_PATH`
 - `RESUME_REPO_PDF_PATH`
 - `RESUME_REPO_REF`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` (optional, defaults to `gpt-4o` in CI and `gpt-4o-mini` locally)
 
 The resume content is fetched in CI and written to:
 
