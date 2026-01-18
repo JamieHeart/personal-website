@@ -1,5 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { loadProfile } from "@/lib/profile";
 
 async function loadResumeMarkdown() {
@@ -20,7 +22,11 @@ export default async function ResumePage() {
       </div>
       <div className="card">
         <h2>Resume Content</h2>
-        <pre style={{ whiteSpace: "pre-wrap", margin: 0 }}>{resumeMarkdown}</pre>
+        <div className="resume-markdown">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {resumeMarkdown}
+          </ReactMarkdown>
+        </div>
       </div>
       <div className="card">
         <h2>Download</h2>
