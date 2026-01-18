@@ -32,6 +32,9 @@ export default function AdminPostsPage() {
   const [status, setStatus] = useState<{ message: string; variant: StatusVariant } | null>(null);
   const [slugStatus, setSlugStatus] = useState<{ message: string; variant: StatusVariant } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [listAction, setListAction] = useState<
+    { type: "edit" | "delete"; slug: string } | null
+  >(null);
   const [generating, setGenerating] = useState(false);
   const [slugChecking, setSlugChecking] = useState(false);
 
@@ -45,6 +48,8 @@ export default function AdminPostsPage() {
   useEffect(() => {
     if (token) {
       window.localStorage.setItem("adminToken", token);
+    } else {
+      window.localStorage.removeItem("adminToken");
     }
   }, [token]);
 
@@ -232,6 +237,7 @@ export default function AdminPostsPage() {
   async function handleEdit(slug: string) {
     setStatus(null);
     setBusy(true);
+    setListAction({ type: "edit", slug });
     try {
       const res = await fetch(`/api/posts/${slug}`, { cache: "no-store" });
       if (!res.ok) {
@@ -252,6 +258,7 @@ export default function AdminPostsPage() {
       setStatusMessage("Failed to load post.", "error");
     } finally {
       setBusy(false);
+      setListAction(null);
     }
   }
 
@@ -259,6 +266,7 @@ export default function AdminPostsPage() {
     if (!confirm(`Delete ${slug}?`)) return;
     setStatus(null);
     setBusy(true);
+    setListAction({ type: "delete", slug });
     try {
       const res = await fetch(`/api/posts/${slug}`, {
         method: "DELETE",
@@ -275,6 +283,7 @@ export default function AdminPostsPage() {
       setStatusMessage("Request failed.", "error");
     } finally {
       setBusy(false);
+      setListAction(null);
     }
   }
 
@@ -412,15 +421,24 @@ export default function AdminPostsPage() {
                   <div className="admin-meta">{post.slug}</div>
                 </div>
                 <div className="admin-actions">
-                  <button type="button" onClick={() => handleEdit(post.slug)}>
-                    Edit
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(post.slug)}
+                    disabled={busy}
+                  >
+                    {busy && listAction?.type === "edit" && listAction.slug === post.slug
+                      ? "Loading…"
+                      : "Edit"}
                   </button>
                   <button
                     type="button"
                     className="danger"
                     onClick={() => handleDelete(post.slug)}
+                    disabled={busy}
                   >
-                    Delete
+                    {busy && listAction?.type === "delete" && listAction.slug === post.slug
+                      ? "Deleting…"
+                      : "Delete"}
                   </button>
                 </div>
               </div>
