@@ -103,7 +103,7 @@ For local runs, set:
 
 - `TF_VAR_domain_name`
 - `TF_VAR_hosted_zone_id`
-- `TF_VAR_admin_token`
+- `TF_VAR_admin_token` (or `ADMIN_TOKEN`)
 
 Initialize and plan:
 
@@ -145,7 +145,7 @@ Required GitHub Secrets:
 - `TF_STATE_REGION` (state backend region, optional if same as `AWS_REGION`)
 - `TF_VAR_domain_name`
 - `TF_VAR_hosted_zone_id`
-- `TF_VAR_admin_token`
+- `TF_VAR_admin_token` (or `ADMIN_TOKEN`)
 - `TF_VAR_project_name` (optional)
 - `RESUME_REPO_TOKEN`
 - `RESUME_REPO_OWNER`
