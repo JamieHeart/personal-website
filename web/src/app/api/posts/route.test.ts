@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const send = vi.fn();
-const requireAdmin = vi.fn();
+const { send, requireAdmin } = vi.hoisted(() => ({
+  send: vi.fn(),
+  requireAdmin: vi.fn(),
+}));
 
 vi.mock("@/lib/dynamo", () => ({
   blogTableName: "test-table",
