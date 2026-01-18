@@ -1,23 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
-type BlogPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  tags?: string[];
-  publishedAt?: string;
-  updatedAt?: string;
-};
-
-type GeneratedFields = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  tags: string[];
-};
+import StatusMessage, { type StatusVariant } from "@/components/StatusMessage";
+import {
+  mergeGeneratedFields,
+  type BlogPost,
+  type GeneratedFields,
+} from "@/lib/adminPosts";
 
 const emptyForm: BlogPost = {
   slug: "",
@@ -40,9 +29,11 @@ export default function AdminPostsPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [form, setForm] = useState<BlogPost>(emptyForm);
   const [isEditing, setIsEditing] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
+  const [status, setStatus] = useState<{ message: string; variant: StatusVariant } | null>(null);
+  const [slugStatus, setSlugStatus] = useState<{ message: string; variant: StatusVariant } | null>(null);
   const [busy, setBusy] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [slugChecking, setSlugChecking] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("adminToken");
@@ -65,17 +56,28 @@ export default function AdminPostsPage() {
     return result;
   }, [token]);
 
+  function setStatusMessage(message: string, variant: StatusVariant = "info") {
+    setStatus({ message, variant });
+  }
+
+  function setSlugStatusMessage(
+    message: string,
+    variant: StatusVariant = "info"
+  ) {
+    setSlugStatus({ message, variant });
+  }
+
   async function loadPosts() {
     try {
       const res = await fetch("/api/posts", { cache: "no-store" });
       if (!res.ok) {
-        setStatus("Failed to load posts.");
+        setStatusMessage("Failed to load posts.", "error");
         return;
       }
       const data = (await res.json()) as BlogPost[];
       setPosts(data);
     } catch {
-      setStatus("Failed to load posts.");
+      setStatusMessage("Failed to load posts.", "error");
     }
   }
 
@@ -90,6 +92,7 @@ export default function AdminPostsPage() {
   function resetForm() {
     setForm(emptyForm);
     setIsEditing(false);
+    setSlugStatus(null);
   }
 
   async function generateFields(content: string): Promise<GeneratedFields | null> {
@@ -103,17 +106,62 @@ export default function AdminPostsPage() {
       });
       if (!res.ok) {
         const errorText = await res.text();
-        setStatus(`Failed to generate fields: ${errorText}`);
+        setStatusMessage(`Failed to generate fields: ${errorText}`, "error");
         return null;
       }
       return (await res.json()) as GeneratedFields;
     } catch {
-      setStatus("Failed to generate fields.");
+      setStatusMessage("Failed to generate fields.", "error");
       return null;
     } finally {
       setGenerating(false);
     }
   }
+
+  async function checkSlugConflict(slug: string): Promise<boolean> {
+    const normalized = slug.trim();
+    if (!normalized) {
+      setSlugStatus(null);
+      return false;
+    }
+    setSlugChecking(true);
+    try {
+      const res = await fetch(`/api/posts/${encodeURIComponent(normalized)}`, {
+        cache: "no-store",
+      });
+      if (res.status === 404) {
+        setSlugStatus(null);
+        return false;
+      }
+      if (res.ok) {
+        setSlugStatusMessage("Slug already exists.", "warning");
+        return true;
+      }
+      setSlugStatusMessage("Failed to validate slug.", "error");
+      return true;
+    } catch {
+      setSlugStatusMessage("Failed to validate slug.", "error");
+      return true;
+    } finally {
+      setSlugChecking(false);
+    }
+  }
+
+  useEffect(() => {
+    if (isEditing) {
+      setSlugStatus(null);
+      return;
+    }
+    const slug = form.slug.trim();
+    if (!slug) {
+      setSlugStatus(null);
+      return;
+    }
+    const handle = window.setTimeout(() => {
+      void checkSlugConflict(slug);
+    }, 500);
+    return () => window.clearTimeout(handle);
+  }, [form.slug, isEditing]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -123,7 +171,7 @@ export default function AdminPostsPage() {
       let nextForm = form;
       if (!isEditing) {
         if (!form.content.trim()) {
-          setStatus("Content is required.");
+          setStatusMessage("Content is required.", "warning");
           return;
         }
         if (!form.slug || !form.title || !form.excerpt || !form.tags?.length) {
@@ -131,11 +179,15 @@ export default function AdminPostsPage() {
           if (!generated) {
             return;
           }
-          nextForm = {
-            ...form,
-            ...generated,
-          };
+          nextForm = mergeGeneratedFields(form, generated);
           setForm(nextForm);
+        }
+      }
+
+      if (!isEditing) {
+        const hasConflict = await checkSlugConflict(nextForm.slug);
+        if (hasConflict) {
+          return;
         }
       }
 
@@ -156,17 +208,22 @@ export default function AdminPostsPage() {
 
       if (!res.ok) {
         const errorText = await res.text();
-        setStatus(
-          `Failed to ${isEditing ? "update" : "create"} post: ${errorText}`
+        if (res.status === 409) {
+          setSlugStatusMessage("Slug already exists.", "warning");
+          return;
+        }
+        setStatusMessage(
+          `Failed to ${isEditing ? "update" : "create"} post: ${errorText}`,
+          "error"
         );
         return;
       }
 
-      setStatus(isEditing ? "Post updated." : "Post created.");
+      setStatusMessage(isEditing ? "Post updated." : "Post created.", "info");
       resetForm();
       await loadPosts();
     } catch {
-      setStatus("Request failed.");
+      setStatusMessage("Request failed.", "error");
     } finally {
       setBusy(false);
     }
@@ -178,7 +235,7 @@ export default function AdminPostsPage() {
     try {
       const res = await fetch(`/api/posts/${slug}`, { cache: "no-store" });
       if (!res.ok) {
-        setStatus("Failed to load post.");
+        setStatusMessage("Failed to load post.", "error");
         return;
       }
       const data = (await res.json()) as BlogPost;
@@ -192,7 +249,7 @@ export default function AdminPostsPage() {
       });
       setIsEditing(true);
     } catch {
-      setStatus("Failed to load post.");
+      setStatusMessage("Failed to load post.", "error");
     } finally {
       setBusy(false);
     }
@@ -209,13 +266,13 @@ export default function AdminPostsPage() {
       });
       if (!res.ok) {
         const errorText = await res.text();
-        setStatus(`Failed to delete post: ${errorText}`);
+        setStatusMessage(`Failed to delete post: ${errorText}`, "error");
         return;
       }
-      setStatus("Post deleted.");
+      setStatusMessage("Post deleted.", "info");
       await loadPosts();
     } catch {
-      setStatus("Request failed.");
+      setStatusMessage("Request failed.", "error");
     } finally {
       setBusy(false);
     }
@@ -266,14 +323,16 @@ export default function AdminPostsPage() {
               type="button"
               onClick={async () => {
                 if (!form.content.trim()) {
-                  setStatus("Add content first.");
+                  setStatusMessage("Add content first.", "warning");
                   return;
                 }
                 const generated = await generateFields(form.content);
                 if (!generated) return;
-                setForm((prev) => ({ ...prev, ...generated }));
+                const nextForm = mergeGeneratedFields(form, generated);
+                setForm(nextForm);
+                await checkSlugConflict(nextForm.slug);
               }}
-              disabled={generating || busy}
+              disabled={generating || busy || slugChecking}
             >
               {generating ? "Generating…" : "Generate slug, title, excerpt, tags"}
             </button>
@@ -286,6 +345,12 @@ export default function AdminPostsPage() {
               placeholder="my-post"
               disabled={isEditing}
             />
+            {slugStatus && (
+              <StatusMessage
+                message={slugStatus.message}
+                variant={slugStatus.variant}
+              />
+            )}
           </label>
           <label>
             Title
@@ -323,7 +388,9 @@ export default function AdminPostsPage() {
           <button type="submit" disabled={busy}>
             {isEditing ? "Update post" : "Create post"}
           </button>
-          {status && <p className="admin-status">{status}</p>}
+          {status && (
+            <StatusMessage message={status.message} variant={status.variant} />
+          )}
         </form>
       </div>
 
