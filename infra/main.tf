@@ -254,6 +254,8 @@ resource "aws_ecs_task_definition" "web" {
         { name = "AWS_REGION", value = var.aws_region },
         { name = "BLOG_TABLE_NAME", value = aws_dynamodb_table.blog_posts.name },
         { name = "ADMIN_TOKEN", value = var.admin_token },
+        { name = "OPENAI_API_KEY", value = var.openai_api_key },
+        { name = "OPENAI_MODEL", value = var.openai_model },
         { name = "NEXT_PUBLIC_SITE_URL", value = "https://${var.domain_name}" }
       ],
       logConfiguration = {

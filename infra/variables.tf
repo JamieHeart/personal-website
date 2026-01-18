@@ -56,6 +56,18 @@ variable "admin_token" {
   sensitive   = true
 }
 
+variable "openai_api_key" {
+  description = "OpenAI API key for blog field generation"
+  type        = string
+  sensitive   = true
+}
+
+variable "openai_model" {
+  description = "OpenAI model for blog field generation"
+  type        = string
+  default     = ""
+}
+
 variable "skip_cert_validation_records" {
   description = "Skip ACM validation Route53 records (useful for importing state)"
   type        = bool
