@@ -6,6 +6,17 @@ type BlogPost = {
   publishedAt?: string;
 };
 
+function formatDate(value?: string) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 async function getPost(slug: string): Promise<BlogPost | null> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/posts/${slug}`, {
@@ -36,7 +47,9 @@ export default async function BlogPostPage({
   return (
     <section>
       <h1>{post.title}</h1>
-      <p>{post.publishedAt}</p>
+      {post.publishedAt && (
+        <p className="post-date">{formatDate(post.publishedAt)}</p>
+      )}
       <div className="card">
         <p>{post.content}</p>
       </div>
