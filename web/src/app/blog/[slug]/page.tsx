@@ -1,3 +1,5 @@
+import MarkdownContent from "@/components/MarkdownContent";
+
 type BlogPost = {
   slug: string;
   title: string;
@@ -51,7 +53,7 @@ export default async function BlogPostPage({
         <p className="post-date">{formatDate(post.publishedAt)}</p>
       )}
       <div className="card">
-        <p>{post.content}</p>
+        <MarkdownContent content={post.content} />
       </div>
       <div>
         {post.tags?.map((tag) => (
