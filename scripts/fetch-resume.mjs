@@ -150,6 +150,8 @@ function normalizePersonalization(payload) {
     !whatIDo ||
     featured.length < 5 ||
     coreCompetencies.length < 4 ||
+    values.length < 3 ||
+    highlights.length < 3 ||
     leadershipSkills.length < 3 ||
     technicalSkills.length < 3
   ) {
