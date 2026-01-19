@@ -40,58 +40,8 @@ function formatDate(value?: string) {
 }
 
 export default async function HomePage() {
-  const profile = loadProfile();
-  const personalization = loadPersonalization();
   const recentPosts = await loadRecentPosts();
   const allPosts = await loadAllPosts();
-  const summary = personalization?.summary ?? profile.tagline ?? "Engineering leader.";
-  const whatIDo =
-    personalization?.whatIDo ??
-    "I build resilient platforms, align teams to strategy, and deliver measurable outcomes.";
-  const highlights =
-    personalization?.highlights ?? [
-      "Drive platform roadmaps with measurable outcomes.",
-      "Lead multi-team engineering orgs across domains.",
-      "Deliver cloud-native systems with high reliability.",
-      "Coach managers and senior engineers to scale impact.",
-    ];
-  const coreCompetencies =
-    personalization?.coreCompetencies ?? [
-      "Engineering leadership and org execution",
-      "Platform strategy and API-first systems",
-      "Cloud-native architecture and reliability",
-      "Cross-functional alignment and roadmapping",
-      "Talent development and inclusive culture",
-    ];
-  const leadershipSkills =
-    personalization?.skills?.leadership ?? [
-      "Coaching and mentorship",
-      "Operational cadence and delivery",
-      "Stakeholder alignment",
-      "Hiring and team development",
-    ];
-  const technicalSkills =
-    personalization?.skills?.technical ?? [
-      "AWS/GCP and cloud-native architecture",
-      "API-first services and microservices",
-      "Observability and reliability",
-      "CI/CD and modern SDLC",
-    ];
-  const values =
-    personalization?.values ?? [
-      "Transparency and accountability",
-      "Empathy and collaboration",
-      "Continuous learning",
-      "Outcome-driven leadership",
-    ];
-  const featured =
-    personalization?.featured ?? [
-      "Operational excellence and delivery leadership",
-      "Cross-functional alignment and roadmap execution",
-      "Coaching engineers into strong technical leaders",
-      "AI-enabled process improvement and automation",
-      "Scalable systems and reliability practices",
-    ];
   const tagCounts = allPosts
     .flatMap((post) => post.tags ?? [])
     .reduce<Record<string, number>>((acc, tag) => {
@@ -106,48 +56,19 @@ export default async function HomePage() {
   return (
     <section className="hero">
       <div className="card">
-        <h2>Summary</h2>
-        <p>{summary}</p>
-        <p>{whatIDo}</p>
-      </div>
-      <div className="card">
-        <h2>Highlights</h2>
-        <ul>
-          {highlights.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="card">
-        <h2>Core Competencies</h2>
-        <ul>
-          {coreCompetencies.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="card">
-        <h2>Skills</h2>
-        <h3>Leadership</h3>
-        <ul>
-          {leadershipSkills.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-        <h3>Technical</h3>
-        <ul>
-          {technicalSkills.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="card">
-        <h2>Values</h2>
-        <ul>
-          {values.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <h2>About This Site</h2>
+        <p>
+          This site auto-builds from a private resume repo. During build, it
+          fetches the resume, uses OpenAI to generate personalization data, and
+          renders pages from that structured output.
+        </p>
+        <p>
+          At runtime, the site serves those personalized pages and a blog API,
+          with profile fallbacks for local development.
+        </p>
+        <p>
+          <a href="/about">Read the project README</a>
+        </p>
       </div>
       <div className="card">
         <h2>Latest Posts</h2>
@@ -205,14 +126,6 @@ export default async function HomePage() {
               })}
           </div>
         )}
-      </div>
-      <div className="card">
-        <h2>Featured</h2>
-        <ul>
-          {featured.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
       </div>
     </section>
   );
