@@ -29,6 +29,21 @@ export default function RootLayout({
                 {profile.name}
               </a>
               <nav className="nav">
+              <a className="nav-link" href="/about">
+                <span className="nav-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="img">
+                    <path
+                      d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 8.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm2 7h-4v-1.5h1.2V12H10v-1.5h3.5v5H14v1.5Z"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                About
+              </a>
               <a className="nav-link" href="/resume">
                 <span className="nav-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" role="img">
