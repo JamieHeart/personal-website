@@ -4,6 +4,33 @@ import { loadPersonalization } from "@/lib/personalization";
 import { loadProfile } from "@/lib/profile";
 import MarkdownContent from "@/components/MarkdownContent";
 
+const DEFAULT_HIGHLIGHTS = [
+  "Lead multi-team engineering organizations and platform roadmaps",
+  "Deliver reliable, cloud-native services with measurable outcomes",
+  "Coach managers and engineers to scale impact",
+];
+const DEFAULT_CORE_COMPETENCIES = [
+  "Engineering leadership and operating rhythm",
+  "Platform strategy and API-first services",
+  "Cloud-native architecture and reliability",
+  "Cross-functional alignment and delivery",
+];
+const DEFAULT_LEADERSHIP_SKILLS = [
+  "Coaching and mentorship",
+  "Stakeholder alignment",
+  "Hiring and team development",
+];
+const DEFAULT_TECHNICAL_SKILLS = [
+  "AWS/GCP and cloud-native architecture",
+  "API-first services and microservices",
+  "Observability and reliability practices",
+];
+const DEFAULT_VALUES = [
+  "Transparency and accountability",
+  "Empathy and collaboration",
+  "Continuous learning",
+];
+
 async function loadResumeMarkdown() {
   const resumePath = path.join(process.cwd(), "src", "content", "resume.md");
   return fs.readFile(resumePath, "utf-8");
@@ -14,38 +41,17 @@ export default async function ResumePage() {
   const personalization = loadPersonalization();
   const resumeMarkdown = await loadResumeMarkdown();
   const summary = personalization?.summary ?? profile.tagline;
-  const whatIDo = personalization?.whatIDo ?? profile.tagline;
+  const whatIDo = personalization?.whatIDo;
   const highlights =
-    personalization?.highlights ?? [
-      "Lead multi-team engineering organizations and platform roadmaps",
-      "Deliver reliable, cloud-native services with measurable outcomes",
-      "Coach managers and engineers to scale impact",
-    ];
+    personalization?.highlights ?? DEFAULT_HIGHLIGHTS;
   const coreCompetencies =
-    personalization?.coreCompetencies ?? [
-      "Engineering leadership and operating rhythm",
-      "Platform strategy and API-first services",
-      "Cloud-native architecture and reliability",
-      "Cross-functional alignment and delivery",
-    ];
+    personalization?.coreCompetencies ?? DEFAULT_CORE_COMPETENCIES;
   const leadershipSkills =
-    personalization?.skills?.leadership ?? [
-      "Coaching and mentorship",
-      "Stakeholder alignment",
-      "Hiring and team development",
-    ];
+    personalization?.skills?.leadership ?? DEFAULT_LEADERSHIP_SKILLS;
   const technicalSkills =
-    personalization?.skills?.technical ?? [
-      "AWS/GCP and cloud-native architecture",
-      "API-first services and microservices",
-      "Observability and reliability practices",
-    ];
-  const values =
-    personalization?.values ?? [
-      "Transparency and accountability",
-      "Empathy and collaboration",
-      "Continuous learning",
-    ];
+    personalization?.skills?.technical ?? DEFAULT_TECHNICAL_SKILLS;
+  const values = personalization?.values ?? DEFAULT_VALUES;
+  const shouldRenderWhatIDo = whatIDo && whatIDo !== summary;
 
   return (
     <section>
@@ -53,7 +59,7 @@ export default async function ResumePage() {
       <div className="card">
         <h2>Summary</h2>
         <p>{summary}</p>
-        <p>{whatIDo}</p>
+        {shouldRenderWhatIDo ? <p>{whatIDo}</p> : null}
       </div>
       <div className="card">
         <h2>Highlights</h2>

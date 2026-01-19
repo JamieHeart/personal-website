@@ -1,4 +1,5 @@
 import "./globals.css";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { loadPersonalization } from "@/lib/personalization";
 import { loadProfile } from "@/lib/profile";
@@ -105,10 +106,12 @@ export default function RootLayout({
                 rel="noreferrer"
                 aria-label="LinkedIn profile"
               >
-                <img
+                <Image
                   className="chit-image"
                   src="/linkedin-avatar.jpg"
                   alt={`LinkedIn profile photo of ${profile.name}`}
+                  width={44}
+                  height={44}
                 />
               </a>
               <a
@@ -118,10 +121,12 @@ export default function RootLayout({
                 rel="noreferrer"
                 aria-label="GitHub profile"
               >
-                <img
+                <Image
                   className="chit-image"
                   src="/github-avatar.png"
                   alt={`GitHub avatar for ${profile.name}`}
+                  width={44}
+                  height={44}
                 />
               </a>
             </div>
