@@ -85,6 +85,18 @@ a {
   margin-right: 8px;
 }
 
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  line-height: 1.4;
+}
+
+.tag-cloud-item {
+  color: #cbd5f5;
+  text-decoration: none;
+}
+
 .hero {
   margin-top: 32px;
 }

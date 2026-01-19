@@ -1,10 +1,18 @@
-name: CI
+name: Manual Commands
 
 on:
-  pull_request:
-  push:
-    branches: ["main"]
   workflow_dispatch:
+    inputs:
+      task:
+        description: "Which task to run"
+        type: choice
+        options:
+          - lint
+          - typecheck
+          - test
+          - build
+          - all
+        default: all
 
 jobs:
   web:
@@ -23,21 +31,15 @@ jobs:
           cache-dependency-path: web/package.json
       - name: Install
         run: npm install
-      - name: Fetch resume content
-        run: node scripts/fetch-resume.mjs
-        working-directory: .
-        env:
-          RESUME_REPO_TOKEN: ${{ secrets.RESUME_REPO_TOKEN }}
-          RESUME_REPO_OWNER: ${{ secrets.RESUME_REPO_OWNER }}
-          RESUME_REPO_NAME: ${{ secrets.RESUME_REPO_NAME }}
-          RESUME_REPO_README_PATH: ${{ secrets.RESUME_REPO_README_PATH }}
-          RESUME_REPO_PDF_PATH: ${{ secrets.RESUME_REPO_PDF_PATH }}
-          RESUME_REPO_REF: ${{ secrets.RESUME_REPO_REF }}
       - name: Lint
+        if: ${{ inputs.task == 'lint' || inputs.task == 'all' }}
         run: npm run lint
       - name: Typecheck
+        if: ${{ inputs.task == 'typecheck' || inputs.task == 'all' }}
         run: npm run typecheck
       - name: Unit tests
+        if: ${{ inputs.task == 'test' || inputs.task == 'all' }}
         run: npm test
       - name: Build
+        if: ${{ inputs.task == 'build' || inputs.task == 'all' }}
         run: npm run build
