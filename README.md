@@ -122,6 +122,15 @@ For local runs, set:
 - `TF_VAR_hosted_zone_id`
 - `TF_VAR_admin_token` (or `ADMIN_TOKEN`)
 
+To set cost-reporting tags and other defaults, copy the example vars file:
+
+```
+cp infra/terraform.tfvars.example infra/terraform.tfvars
+```
+
+`infra/terraform.tfvars` is ignored by git. Edit it for per-environment values
+like `project_name`, `environment`, `owner`, and `cost_center`.
+
 Initialize and plan:
 
 ```

@@ -8,6 +8,7 @@ terraform.tfstate.backup
 infra/.terraform
 infra/terraform.tfstate
 infra/terraform.tfstate.backup
+infra/terraform.tfvars
 *.log
 dist
 *.tsbuildinfo

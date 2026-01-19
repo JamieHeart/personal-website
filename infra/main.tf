@@ -1,5 +1,17 @@
 locals {
   name_prefix = var.project_name
+  default_tags = merge(
+    {
+      Project     = var.project_name
+      Application = var.project_name
+      Environment = var.environment
+      Owner       = var.owner
+      CostCenter  = var.cost_center
+      Service     = var.service_name
+      ManagedBy   = "Terraform"
+    },
+    var.additional_tags
+  )
 }
 
 data "aws_vpc" "default" {
