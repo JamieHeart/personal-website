@@ -1,0 +1,13 @@
+aws_region = "us-east-1"
+
+# Cost reporting tags
+project_name = "my-project"
+environment  = "production"
+owner        = "owner-name"
+cost_center  = "cost-center"
+service_name = "web"
+
+# Extra tags for any additional reporting needs
+additional_tags = {
+  Department = "Engineering"
+}

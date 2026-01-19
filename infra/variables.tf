@@ -10,6 +10,36 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "environment" {
+  description = "Environment tag for cost reporting"
+  type        = string
+  default     = "production"
+}
+
+variable "owner" {
+  description = "Owner tag for cost reporting"
+  type        = string
+  default     = "Jamie Hartman"
+}
+
+variable "cost_center" {
+  description = "Cost center tag for reporting"
+  type        = string
+  default     = "personal"
+}
+
+variable "service_name" {
+  description = "Service tag for reporting"
+  type        = string
+  default     = "web"
+}
+
+variable "additional_tags" {
+  description = "Additional tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}
+
 variable "domain_name" {
   description = "Full domain name for the site (e.g., example.com)"
   type        = string
