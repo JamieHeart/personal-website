@@ -6,12 +6,12 @@ const rootDir = path.resolve(process.cwd());
 const envPath = path.join(rootDir, ".env");
 const outputMarkdown = path.join(rootDir, "web", "src", "content", "resume.md");
 const outputPdf = path.join(rootDir, "web", "public", "resume.pdf");
-const outputWhatIDo = path.join(
+const outputPersonalization = path.join(
   rootDir,
   "web",
   "src",
   "content",
-  "what-i-do.json"
+  "personalization.json"
 );
 const profilePath = path.join(rootDir, "config", "profile.json");
 
@@ -110,29 +110,71 @@ function readJsonIfExists(filePath) {
   }
 }
 
-function normalizeSummary(summary) {
-  const title = String(summary?.title ?? "").trim();
-  const tagline = String(summary?.tagline ?? "").trim();
-  const whatIDo = String(summary?.whatIDo ?? "")
+function normalizeStringArray(value, { min = 1, max = 8 } = {}) {
+  const items = Array.isArray(value)
+    ? value.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  if (items.length < min) return [];
+  return items.slice(0, max);
+}
+
+function normalizePersonalization(payload) {
+  const title = String(payload?.title ?? "").trim();
+  const tagline = String(payload?.tagline ?? "").trim();
+  const summary = String(payload?.summary ?? "")
     .replace(/\s*\n\s*/g, " ")
     .trim();
-  const featured = Array.isArray(summary?.featured)
-    ? summary.featured.map((item) => String(item).trim()).filter(Boolean)
-    : [];
+  const whatIDo = String(payload?.whatIDo ?? "")
+    .replace(/\s*\n\s*/g, " ")
+    .trim();
+  const featured = normalizeStringArray(payload?.featured, { min: 5, max: 5 });
+  const coreCompetencies = normalizeStringArray(payload?.coreCompetencies, {
+    min: 4,
+    max: 8,
+  });
+  const values = normalizeStringArray(payload?.values, { min: 3, max: 6 });
+  const highlights = normalizeStringArray(payload?.highlights, { min: 3, max: 8 });
+  const leadershipSkills = normalizeStringArray(
+    payload?.skills?.leadership,
+    { min: 3, max: 10 }
+  );
+  const technicalSkills = normalizeStringArray(payload?.skills?.technical, {
+    min: 3,
+    max: 12,
+  });
 
-  if (!title || !tagline || !whatIDo || featured.length < 5) {
-    throw new Error("OpenAI summary response is incomplete.");
+  if (
+    !title ||
+    !tagline ||
+    !summary ||
+    !whatIDo ||
+    featured.length < 5 ||
+    coreCompetencies.length < 4 ||
+    values.length < 3 ||
+    highlights.length < 3 ||
+    leadershipSkills.length < 3 ||
+    technicalSkills.length < 3
+  ) {
+    throw new Error("OpenAI personalization response is incomplete.");
   }
 
   return {
     title,
     tagline,
+    summary,
     whatIDo,
-    featured: featured.slice(0, 5),
+    featured,
+    coreCompetencies,
+    values,
+    highlights,
+    skills: {
+      leadership: leadershipSkills,
+      technical: technicalSkills,
+    },
   };
 }
 
-async function generateWhatIDo(readmeContent) {
+async function generatePersonalization(readmeContent) {
   if (!openAiApiKey) {
     throw new Error("Missing OPENAI_API_KEY env var.");
   }
@@ -158,8 +200,13 @@ async function generateWhatIDo(readmeContent) {
             "Summarize the following resume README into JSON with these keys:",
             "- title: professional title",
             "- tagline: single-sentence statement",
-            "- whatIDo: one paragraph summary",
+            "- summary: 1-2 sentence overview",
+            "- whatIDo: one-paragraph summary",
             "- featured: array of 5 concise bullet strings",
+            "- coreCompetencies: array of 4-8 concise items",
+            "- skills: object with leadership (3-10 items) and technical (3-12 items)",
+            "- values: array of 3-6 leadership values",
+            "- highlights: array of 3-8 measurable outcomes or differentiators",
             "Keep tone professional, confident, and concise.",
             "",
             "Resume README:",
@@ -184,7 +231,7 @@ async function generateWhatIDo(readmeContent) {
   }
 
   const summary = JSON.parse(content);
-  return normalizeSummary(summary);
+  return normalizePersonalization(summary);
 }
 
 function updateProfileSummary(summary) {
@@ -210,21 +257,24 @@ async function main() {
   fs.writeFileSync(outputPdf, pdfContent);
 
   const readmeHash = sha256(readmeContent);
-  const cached = readJsonIfExists(outputWhatIDo);
+  const cached = readJsonIfExists(outputPersonalization);
   if (cached?.readmeHash === readmeHash) {
-    console.log("What I Do summary is up to date; skipping generation.");
+    console.log("Personalization data is up to date; skipping generation.");
   } else {
-    const summary = await generateWhatIDo(readmeContent);
+    const summary = await generatePersonalization(readmeContent);
     const payload = {
       readmeHash,
       model: openAiModel,
       generatedAt: new Date().toISOString(),
       ...summary,
     };
-    fs.mkdirSync(path.dirname(outputWhatIDo), { recursive: true });
-    fs.writeFileSync(outputWhatIDo, `${JSON.stringify(payload, null, 2)}\n`);
+    fs.mkdirSync(path.dirname(outputPersonalization), { recursive: true });
+    fs.writeFileSync(
+      outputPersonalization,
+      `${JSON.stringify(payload, null, 2)}\n`
+    );
     updateProfileSummary(summary);
-    console.log(`Wrote What I Do summary to ${outputWhatIDo}`);
+    console.log(`Wrote personalization summary to ${outputPersonalization}`);
   }
 
   console.log(`Wrote resume markdown to ${outputMarkdown}`);

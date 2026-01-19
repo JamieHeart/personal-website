@@ -1,5 +1,4 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import { loadPersonalization } from "@/lib/personalization";
 import { loadProfile } from "@/lib/profile";
 
 type BlogPostSummary = {
@@ -9,32 +8,6 @@ type BlogPostSummary = {
   tags?: string[];
   publishedAt?: string;
 };
-
-type WhatIDoSummary = {
-  title: string;
-  tagline: string;
-  whatIDo: string;
-  featured: string[];
-};
-
-async function loadWhatIDo() {
-  const summaryPath = path.join(process.cwd(), "src", "content", "what-i-do.json");
-  try {
-    const raw = await fs.readFile(summaryPath, "utf-8");
-    const parsed = JSON.parse(raw) as WhatIDoSummary;
-    if (
-      !parsed?.title ||
-      !parsed?.tagline ||
-      !parsed?.whatIDo ||
-      !Array.isArray(parsed?.featured)
-    ) {
-      return null;
-    }
-    return parsed;
-  } catch {
-    return null;
-  }
-}
 
 async function loadRecentPosts(): Promise<BlogPostSummary[]> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -67,23 +40,8 @@ function formatDate(value?: string) {
 }
 
 export default async function HomePage() {
-  const profile = loadProfile();
-  const summary = await loadWhatIDo();
   const recentPosts = await loadRecentPosts();
   const allPosts = await loadAllPosts();
-  const title = summary?.title ?? profile.title ?? "Software Engineering Leader";
-  const tagline =
-    summary?.tagline ??
-    profile.tagline ??
-    "Building high-performing teams and scalable systems.";
-  const featured =
-    summary?.featured ?? [
-      "Operational excellence and delivery leadership",
-      "Cross-functional alignment and roadmap execution",
-      "Coaching engineers into strong technical leaders",
-      "AI-enabled process improvement and automation",
-      "Scalable systems and reliability practices",
-    ];
   const tagCounts = allPosts
     .flatMap((post) => post.tags ?? [])
     .reduce<Record<string, number>>((acc, tag) => {
@@ -97,6 +55,21 @@ export default async function HomePage() {
 
   return (
     <section className="hero">
+      <div className="card">
+        <h2>About This Site</h2>
+        <p>
+          This site auto-builds from a private resume repo. During build, it
+          fetches the resume, uses OpenAI to generate personalization data, and
+          renders pages from that structured output.
+        </p>
+        <p>
+          At runtime, the site serves those personalized pages and a blog API,
+          with profile fallbacks for local development.
+        </p>
+        <p>
+          <a href="/about">Read the project README</a>
+        </p>
+      </div>
       <div className="card">
         <h2>Latest Posts</h2>
         {recentPosts.length === 0 ? (
@@ -153,14 +126,6 @@ export default async function HomePage() {
               })}
           </div>
         )}
-      </div>
-      <div className="card">
-        <h2>Featured</h2>
-        <ul>
-          {featured.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
       </div>
     </section>
   );
