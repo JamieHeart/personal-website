@@ -18,6 +18,23 @@ This repo is the control plane for a personal website with a blog backend, infra
 - `config/`: personalization config
 - `CONTEXT.md`: running decisions and instructions
 
+## Build-Time vs Runtime
+
+Build time focuses on assembling content and infrastructure artifacts. Runtime focuses on serving personalized pages and the blog API.
+
+### Build time
+
+- Fetch resume README/PDF from a private GitHub repo via `scripts/fetch-resume.mjs`.
+- Use OpenAI to summarize the resume into `web/src/content/personalization.json`.
+- Generate `web/src/content/resume.md` and `web/public/resume.pdf`.
+- Build the Next.js app and Docker image; CI/CD applies Terraform and deploys to ECS.
+
+### Runtime
+
+- Serve the Next.js site (home, resume, blog UI) using personalization data with fallbacks from `config/profile.json`.
+- Serve blog CRUD API routes backed by DynamoDB.
+- Optional future OpenAI usage can be added via API routes (not implemented today).
+
 ## Local Setup
 
 1. Install dependencies
@@ -49,7 +66,7 @@ Requires the AWS CLI to be installed locally.
 cp web/.env.example web/.env.local
 ```
 
-5. (Optional) Fetch resume content from the private repo
+5. Fetch resume content from the private repo (required for personalization)
 
 ```
 RESUME_REPO_TOKEN=... node scripts/fetch-resume.mjs
@@ -158,6 +175,19 @@ Required GitHub Secrets:
 
 ## Personalization
 
+The site is auto-personalized from a private GitHub resume repo. The build step fetches the resume README/PDF and uses OpenAI to generate structured personalization data.
+
+```mermaid
+flowchart TD
+  resumeRepo[PrivateResumeRepo] --> fetchResume[fetchResumeScript]
+  fetchResume --> resumeMd[ResumeMarkdown]
+  fetchResume --> resumePdf[ResumePDF]
+  resumeMd --> openai[OpenAIExtract]
+  openai --> personalizationJson[PersonalizationJSON]
+  personalizationJson --> sitePages[SitePages]
+  personalizationJson --> metadata[SiteMetadata]
+```
+
 Edit `config/profile.json` to set name, title, and links. These values are loaded at runtime and can be overridden via environment variables:
 
 - `PROFILE_NAME`
@@ -180,6 +210,12 @@ The resume content is fetched in CI and written to:
 - `web/src/content/resume.md`
 - `web/public/resume.pdf`
 
+OpenAI is used at build time to generate:
+
+- `web/src/content/personalization.json` (title, tagline, summary, skills, highlights, etc.)
+
+Runtime OpenAI usage is currently not implemented, but the runtime environment can support future on-demand personalization or assistant features via API routes.
+
 You can keep resume repo secrets in a root `.env` file for local runs:
 
 ```
@@ -188,7 +224,7 @@ cp .env.example .env
 
 ## Customization
 
-- Update `web/src/app/page.tsx` for homepage messaging
+- Update `web/src/app/page.tsx` for homepage sections
 - Update `web/src/app/resume/page.tsx` and replace `web/public/resume.pdf`
 - Update `web/src/app/blog/*` for blog UI
 

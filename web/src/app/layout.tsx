@@ -1,12 +1,16 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { loadPersonalization } from "@/lib/personalization";
 import { loadProfile } from "@/lib/profile";
 
+const personalization = loadPersonalization();
 const profile = loadProfile();
+const displayTitle = personalization?.title ?? profile.title;
+const displayTagline = personalization?.tagline ?? profile.tagline;
 
 export const metadata: Metadata = {
-  title: `${profile.name} - ${profile.title}`,
-  description: profile.tagline,
+  title: `${profile.name} - ${displayTitle}`,
+  description: displayTagline,
 };
 
 export default function RootLayout({
@@ -18,11 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header className="site-header">
-          <div className="container">
-            <a className="brand" href="/">
-              {profile.name}
-            </a>
-            <nav className="nav">
+          <div className="container header-inner">
+            <div className="header-left">
+              <a className="brand" href="/">
+                {profile.name}
+              </a>
+              <nav className="nav">
               <a className="nav-link" href="/resume">
                 <span className="nav-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" role="img">
@@ -90,7 +95,36 @@ export default function RootLayout({
                 </span>
                 GitHub
               </a>
-            </nav>
+              </nav>
+            </div>
+            <div className="header-chits">
+              <a
+                className="chit-link"
+                href={profile.linkedinUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn profile"
+              >
+                <img
+                  className="chit-image"
+                  src="/linkedin-avatar.jpg"
+                  alt={`LinkedIn profile photo of ${profile.name}`}
+                />
+              </a>
+              <a
+                className="chit-link"
+                href={profile.githubUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="GitHub profile"
+              >
+                <img
+                  className="chit-image"
+                  src="/github-avatar.png"
+                  alt={`GitHub avatar for ${profile.name}`}
+                />
+              </a>
+            </div>
           </div>
         </header>
         <main className="container">{children}</main>
