@@ -20,6 +20,11 @@ jobs:
       TF_VAR_openai_api_key: ${{ secrets.TF_VAR_openai_api_key || secrets.OPENAI_API_KEY }}
       TF_VAR_openai_model: ${{ secrets.TF_VAR_openai_model || secrets.OPENAI_MODEL }}
       TF_VAR_project_name: ${{ secrets.TF_VAR_project_name }}
+      TF_VAR_environment: ${{ secrets.TF_VAR_environment }}
+      TF_VAR_owner: ${{ secrets.TF_VAR_owner }}
+      TF_VAR_cost_center: ${{ secrets.TF_VAR_cost_center }}
+      TF_VAR_service_name: ${{ secrets.TF_VAR_service_name }}
+      TF_VAR_additional_tags: ${{ secrets.TF_VAR_additional_tags }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
