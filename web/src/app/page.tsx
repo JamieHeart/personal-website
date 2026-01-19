@@ -1,5 +1,3 @@
-import { loadPersonalization } from "@/lib/personalization";
-import { loadProfile } from "@/lib/profile";
 
 type BlogPostSummary = {
   slug: string;
@@ -56,7 +54,9 @@ export default async function HomePage() {
   return (
     <section className="hero">
       <div className="card">
-        <h2>About This Site</h2>
+        <h2>
+          <a href="/about">About This Site</a>
+        </h2>
         <p>
           This site auto-builds from a private resume repo. During build, it
           fetches the resume, uses OpenAI to generate personalization data, and
@@ -65,9 +65,6 @@ export default async function HomePage() {
         <p>
           At runtime, the site serves those personalized pages and a blog API,
           with profile fallbacks for local development.
-        </p>
-        <p>
-          <a href="/about">Read the project README</a>
         </p>
       </div>
       <div className="card">
