@@ -173,6 +173,11 @@ Required GitHub Secrets:
 - `TF_VAR_hosted_zone_id`
 - `TF_VAR_admin_token` (or `ADMIN_TOKEN`)
 - `TF_VAR_project_name` (optional)
+- `TF_VAR_environment` (optional)
+- `TF_VAR_owner` (optional)
+- `TF_VAR_cost_center` (optional)
+- `TF_VAR_service_name` (optional)
+- `TF_VAR_additional_tags` (optional JSON map string, e.g. `{"Department":"Engineering"}`)
 - `RESUME_REPO_TOKEN`
 - `RESUME_REPO_OWNER`
 - `RESUME_REPO_NAME`
