@@ -78,6 +78,8 @@ jobs:
           RESUME_REPO_README_PATH: ${{ secrets.RESUME_REPO_README_PATH }}
           RESUME_REPO_PDF_PATH: ${{ secrets.RESUME_REPO_PDF_PATH }}
           RESUME_REPO_REF: ${{ secrets.RESUME_REPO_REF }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
