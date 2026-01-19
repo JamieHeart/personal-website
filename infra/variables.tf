@@ -19,13 +19,13 @@ variable "environment" {
 variable "owner" {
   description = "Owner tag for cost reporting"
   type        = string
-  default     = "Jamie Hartman"
+  default     = "owner-name"
 }
 
 variable "cost_center" {
   description = "Cost center tag for reporting"
   type        = string
-  default     = "personal"
+  default     = "cost-center"
 }
 
 variable "service_name" {
