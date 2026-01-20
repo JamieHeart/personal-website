@@ -43,9 +43,11 @@ describe("RootLayout", () => {
 
   it("renders header, footer, and children", () => {
     const html = renderToStaticMarkup(
-      React.createElement(RootLayout, {
-        children: React.createElement("div", null, "Child content"),
-      })
+      React.createElement(
+        RootLayout,
+        null,
+        React.createElement("div", null, "Child content")
+      )
     );
 
     expect(html).toContain("Jamie Hartman");
