@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -13,6 +13,7 @@ function createJsonResponse(payload: unknown, status = 200) {
 
 describe("AdminPostsPage", () => {
   afterEach(() => {
+    cleanup();
     localStorage.clear();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
