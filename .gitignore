@@ -12,3 +12,4 @@ infra/terraform.tfvars
 *.log
 dist
 *.tsbuildinfo
+test-results

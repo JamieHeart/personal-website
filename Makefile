@@ -1,4 +1,4 @@
-.PHONY: setup dev test test-unit docker-build docker-run db-local db-stop tf-init tf-plan tf-apply deploy
+.PHONY: setup dev test test-unit build docker-build docker-run db-local db-stop tf-init tf-plan tf-apply deploy
 
 ifneq (,$(wildcard .env))
 include .env
@@ -16,6 +16,9 @@ test: test-unit
 
 test-unit:
 	cd web && npm test
+
+build: test
+	cd web && npm run build
 
 docker-build:
 	docker build -t personal-website:local -f web/Dockerfile .

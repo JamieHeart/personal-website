@@ -39,7 +39,7 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         if: ${{ inputs.task == 'test' || inputs.task == 'all' }}
-        run: npm test
+        run: mkdir -p test-results && npm run test:ci
       - name: Build
         if: ${{ inputs.task == 'build' || inputs.task == 'all' }}
         run: npm run build
