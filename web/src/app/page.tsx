@@ -1,45 +1,10 @@
-
-type BlogPostSummary = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  tags?: string[];
-  publishedAt?: string;
-};
-
-async function loadRecentPosts(): Promise<BlogPostSummary[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/posts`, {
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  const posts = (await res.json()) as BlogPostSummary[];
-  return posts.slice(0, 3);
-}
-
-async function loadAllPosts(): Promise<BlogPostSummary[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/posts`, {
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  return (await res.json()) as BlogPostSummary[];
-}
-
-function formatDate(value?: string) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
+import TagList from "@/components/TagList";
+import { fetchPosts } from "@/lib/blogApi";
+import { formatDate } from "@/lib/blogFormat";
 
 export default async function HomePage() {
-  const recentPosts = await loadRecentPosts();
-  const allPosts = await loadAllPosts();
+  const allPosts = await fetchPosts();
+  const recentPosts = allPosts.slice(0, 3);
   const tagCounts = allPosts
     .flatMap((post) => post.tags ?? [])
     .reduce<Record<string, number>>((acc, tag) => {
@@ -84,15 +49,7 @@ export default async function HomePage() {
                 <p className="post-date">{formatDate(post.publishedAt)}</p>
               )}
               <p>{post.excerpt}</p>
-              {!!post.tags?.length && (
-                <div>
-                  {post.tags.map((tag) => (
-                    <span className="badge" key={tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <TagList tags={post.tags} />
             </div>
           ))
         )}

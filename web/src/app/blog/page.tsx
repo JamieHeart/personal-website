@@ -1,35 +1,9 @@
-type BlogPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  tags?: string[];
-  publishedAt?: string;
-};
-
-function formatDate(value?: string) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-async function getPosts(): Promise<BlogPost[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/posts`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    return [];
-  }
-  return res.json();
-}
+import TagList from "@/components/TagList";
+import { fetchPosts } from "@/lib/blogApi";
+import { formatDate } from "@/lib/blogFormat";
 
 export default async function BlogPage() {
-  const posts = await getPosts();
+  const posts = await fetchPosts();
 
   return (
     <section>
@@ -51,13 +25,7 @@ export default async function BlogPage() {
             <p className="post-date">{formatDate(post.publishedAt)}</p>
           )}
           <p>{post.excerpt}</p>
-          <div>
-            {post.tags?.map((tag) => (
-              <span className="badge" key={tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
+          <TagList tags={post.tags} />
         </div>
       ))}
     </section>

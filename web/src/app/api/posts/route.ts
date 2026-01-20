@@ -1,15 +1,9 @@
 import { ScanCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { blogTableName, docClient, requireAdmin } from "@/lib/dynamo";
-
-type BlogPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  tags?: string[];
-  publishedAt?: string;
-  updatedAt?: string;
-};
+import { requireAdminAccess } from "@/lib/apiAuth";
+import { readJson } from "@/lib/apiRequest";
+import { type BlogPost, type BlogPostCreatePayload } from "@/lib/blogTypes";
+import { normalizePostInput } from "@/lib/blogPosts";
+import { blogTableName, docClient } from "@/lib/dynamo";
 
 function isConditionalCheckFailed(error: unknown): boolean {
   return (
@@ -18,23 +12,6 @@ function isConditionalCheckFailed(error: unknown): boolean {
     "name" in error &&
     (error as { name?: string }).name === "ConditionalCheckFailedException"
   );
-}
-
-function normalizePost(input: Partial<BlogPost>): BlogPost {
-  if (!input.slug || !input.title || !input.excerpt || !input.content) {
-    throw new Error("invalid_payload");
-  }
-
-  const now = new Date().toISOString();
-  return {
-    slug: input.slug.trim(),
-    title: input.title.trim(),
-    excerpt: input.excerpt.trim(),
-    content: input.content.trim(),
-    tags: input.tags?.map((tag) => tag.trim()).filter(Boolean),
-    publishedAt: input.publishedAt ?? now,
-    updatedAt: now,
-  };
 }
 
 export async function GET() {
@@ -61,22 +38,19 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  try {
-    requireAdmin(request);
-  } catch {
-    return new Response("Unauthorized", { status: 401 });
+  const unauthorized = requireAdminAccess(request);
+  if (unauthorized) {
+    return unauthorized;
   }
 
-  let payload: Partial<BlogPost>;
-  try {
-    payload = (await request.json()) as Partial<BlogPost>;
-  } catch {
-    return new Response("Invalid JSON", { status: 400 });
+  const payload = await readJson<BlogPostCreatePayload>(request);
+  if (!payload.ok) {
+    return payload.response;
   }
 
   let post: BlogPost;
   try {
-    post = normalizePost(payload);
+    post = normalizePostInput(payload.data);
   } catch {
     return new Response("Invalid post payload", { status: 400 });
   }

@@ -78,6 +78,16 @@ RESUME_REPO_TOKEN=... node scripts/fetch-resume.mjs
 make dev
 ```
 
+### Local build (with tests)
+
+Run the full local verification and build pipeline:
+
+```
+make build
+```
+
+This runs unit tests, lint, typecheck, then builds the web app.
+
 ## Local Debugging
 
 - App logs: terminal running `make dev`
@@ -161,6 +171,9 @@ GitHub Actions will:
 1. Build and test the web app
 2. Build and push the Docker image to ECR
 3. Apply Terraform for deployment
+
+Test runs publish a JUnit summary to the PR checks and discussion via GitHub
+Actions.
 
 Required GitHub Secrets:
 
