@@ -1,62 +1,25 @@
-import { requireAdmin } from "@/lib/dynamo";
+import { requireAdminAccess } from "@/lib/apiAuth";
+import { readJson } from "@/lib/apiRequest";
+import { normalizeGeneratedFields } from "@/lib/blogFields";
 
 type GenerateRequest = {
   content?: string;
 };
 
-type GeneratedFields = {
-  title: string;
-  excerpt: string;
-  tags: string[];
-  slug: string;
-};
-
 const defaultModel = "gpt-4o-mini";
 
-function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
-}
-
-function normalizeFields(fields: Partial<GeneratedFields>): GeneratedFields {
-  const title = String(fields.title ?? "").trim();
-  const excerpt = String(fields.excerpt ?? "").trim();
-  const tags = Array.isArray(fields.tags)
-    ? fields.tags.map((tag) => String(tag).trim()).filter(Boolean)
-    : [];
-  const slug = slugify(String(fields.slug ?? title));
-
-  if (!title || !excerpt || !slug || tags.length === 0) {
-    throw new Error("invalid_payload");
-  }
-
-  return {
-    title,
-    excerpt: excerpt.slice(0, 200),
-    tags: tags.slice(0, 7),
-    slug,
-  };
-}
-
 export async function POST(request: Request) {
-  try {
-    requireAdmin(request);
-  } catch {
-    return new Response("Unauthorized", { status: 401 });
+  const unauthorized = requireAdminAccess(request);
+  if (unauthorized) {
+    return unauthorized;
   }
 
-  let payload: GenerateRequest;
-  try {
-    payload = (await request.json()) as GenerateRequest;
-  } catch {
-    return new Response("Invalid JSON", { status: 400 });
+  const payload = await readJson<GenerateRequest>(request);
+  if (!payload.ok) {
+    return payload.response;
   }
 
-  const content = payload.content?.trim();
+  const content = payload.data.content?.trim();
   if (!content) {
     return new Response("Missing content", { status: 400 });
   }
@@ -114,9 +77,9 @@ export async function POST(request: Request) {
     return new Response("OpenAI response missing content.", { status: 502 });
   }
 
-  let fields: GeneratedFields;
+  let fields: ReturnType<typeof normalizeGeneratedFields>;
   try {
-    fields = normalizeFields(JSON.parse(raw));
+    fields = normalizeGeneratedFields(JSON.parse(raw));
   } catch {
     return new Response("Invalid OpenAI response.", { status: 502 });
   }

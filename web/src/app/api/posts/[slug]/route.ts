@@ -3,17 +3,11 @@ import {
   GetCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { blogTableName, docClient, requireAdmin } from "@/lib/dynamo";
-
-type BlogPost = {
-  slug: string;
-  title?: string;
-  excerpt?: string;
-  content?: string;
-  tags?: string[];
-  publishedAt?: string;
-  updatedAt?: string;
-};
+import { requireAdminAccess } from "@/lib/apiAuth";
+import { readJson } from "@/lib/apiRequest";
+import { buildPostUpdate } from "@/lib/blogPosts";
+import { type BlogPostUpdatePayload } from "@/lib/blogTypes";
+import { blogTableName, docClient } from "@/lib/dynamo";
 
 export async function GET(
   _request: Request,
@@ -37,28 +31,17 @@ export async function PUT(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  try {
-    requireAdmin(request);
-  } catch {
-    return new Response("Unauthorized", { status: 401 });
+  const unauthorized = requireAdminAccess(request);
+  if (unauthorized) {
+    return unauthorized;
   }
 
-  let payload: BlogPost;
-  try {
-    payload = (await request.json()) as BlogPost;
-  } catch {
-    return new Response("Invalid JSON", { status: 400 });
+  const payload = await readJson<BlogPostUpdatePayload>(request);
+  if (!payload.ok) {
+    return payload.response;
   }
 
-  const updatedAt = new Date().toISOString();
-  const updateFields: Partial<BlogPost> = {
-    title: payload.title?.trim(),
-    excerpt: payload.excerpt?.trim(),
-    content: payload.content?.trim(),
-    tags: payload.tags?.map((tag) => tag.trim()).filter(Boolean),
-    publishedAt: payload.publishedAt,
-    updatedAt,
-  };
+  const updateFields = buildPostUpdate(payload.data);
 
   await docClient.send(
     new UpdateCommand({
@@ -75,11 +58,11 @@ export async function PUT(
         "#updatedAt": "updatedAt",
       },
       ExpressionAttributeValues: {
-        ":title": updateFields.title ?? "",
-        ":excerpt": updateFields.excerpt ?? "",
-        ":content": updateFields.content ?? "",
-        ":tags": updateFields.tags ?? [],
-        ":publishedAt": updateFields.publishedAt ?? updatedAt,
+        ":title": updateFields.title,
+        ":excerpt": updateFields.excerpt,
+        ":content": updateFields.content,
+        ":tags": updateFields.tags,
+        ":publishedAt": updateFields.publishedAt,
         ":updatedAt": updateFields.updatedAt,
       },
     })
@@ -92,10 +75,9 @@ export async function DELETE(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  try {
-    requireAdmin(request);
-  } catch {
-    return new Response("Unauthorized", { status: 401 });
+  const unauthorized = requireAdminAccess(request);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   await docClient.send(
