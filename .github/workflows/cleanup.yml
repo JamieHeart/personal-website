@@ -1,12 +1,16 @@
-name: Deploy
+name: Cleanup Legacy Infra
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'cleanup' to confirm"
+        required: true
+        type: string
 
 jobs:
-  deploy:
+  cleanup:
+    if: ${{ github.event.inputs.confirm == 'cleanup' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,21 +40,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Use Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: web/package.json
-      - name: Install web dependencies
-        run: npm install
-        working-directory: web
-      - name: Prepare test reports
-        run: mkdir -p test-results
-        working-directory: web
-      - name: Unit tests
-        run: npm run test:ci
-        working-directory: web
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -104,6 +93,9 @@ jobs:
             -backend-config="dynamodb_table=${TF_STATE_TABLE}" \
             -backend-config="encrypt=true"
         working-directory: infra
-      - name: Deploy
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: infra
+      - name: Terraform Apply (cleanup)
         run: terraform apply -auto-approve
         working-directory: infra

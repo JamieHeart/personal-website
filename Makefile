@@ -43,4 +43,4 @@ tf-plan:
 tf-apply:
 	cd infra && terraform apply
 
-deploy: docker-build tf-apply
+deploy: tf-apply

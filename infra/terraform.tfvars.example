@@ -1,4 +1,15 @@
 aws_region = "us-east-1"
+domain_name = "example.com"
+amplify_repo_url = "https://github.com/owner/repo"
+amplify_branch = "main"
+# amplify_access_token should be set via env/CI as TF_VAR_amplify_access_token
+
+# Resume repo inputs (set token via TF_VAR_resume_repo_token)
+resume_repo_owner = "owner"
+resume_repo_name = "repo"
+resume_repo_readme_path = "README.md"
+resume_repo_pdf_path = "resume.pdf"
+resume_repo_ref = "main"
 
 # Cost reporting tags
 project_name = "my-project"

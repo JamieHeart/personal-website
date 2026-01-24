@@ -45,45 +45,59 @@ variable "domain_name" {
   type        = string
 }
 
-variable "hosted_zone_id" {
-  description = "Route53 hosted zone ID for the domain"
+variable "amplify_repo_url" {
+  description = "Git repository URL for Amplify (e.g., https://github.com/org/repo)"
   type        = string
 }
 
-variable "container_port" {
-  description = "Container port for the web app"
-  type        = number
-  default     = 3000
-}
-
-variable "desired_count" {
-  description = "Number of ECS tasks"
-  type        = number
-  default     = 1
-}
-
-variable "cpu" {
-  description = "Fargate task CPU units"
-  type        = number
-  default     = 256
-}
-
-variable "memory" {
-  description = "Fargate task memory (MiB)"
-  type        = number
-  default     = 512
-}
-
-variable "image_tag" {
-  description = "Docker image tag to deploy"
+variable "amplify_access_token" {
+  description = "Git provider access token for Amplify"
   type        = string
-  default     = "latest"
+  sensitive   = true
+}
+
+variable "amplify_branch" {
+  description = "Git branch to deploy in Amplify"
+  type        = string
+  default     = "main"
 }
 
 variable "admin_token" {
   description = "Admin token for blog write access"
   type        = string
   sensitive   = true
+}
+
+variable "resume_repo_token" {
+  description = "GitHub token for fetching resume content"
+  type        = string
+  sensitive   = true
+}
+
+variable "resume_repo_owner" {
+  description = "Resume repo owner"
+  type        = string
+}
+
+variable "resume_repo_name" {
+  description = "Resume repo name"
+  type        = string
+}
+
+variable "resume_repo_readme_path" {
+  description = "Path to README in resume repo"
+  type        = string
+}
+
+variable "resume_repo_pdf_path" {
+  description = "Path to PDF in resume repo"
+  type        = string
+}
+
+variable "resume_repo_ref" {
+  description = "Git ref for resume repo (branch or tag)"
+  type        = string
+  default     = "main"
 }
 
 variable "openai_api_key" {
@@ -96,10 +110,4 @@ variable "openai_model" {
   description = "OpenAI model for blog field generation"
   type        = string
   default     = ""
-}
-
-variable "skip_cert_validation_records" {
-  description = "Skip ACM validation Route53 records (useful for importing state)"
-  type        = bool
-  default     = false
 }
