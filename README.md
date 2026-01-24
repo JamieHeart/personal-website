@@ -8,7 +8,7 @@ This repo is the control plane for a personal website with a blog backend, infra
 - Blog API: Next.js API routes (CRUD)
 - Data: DynamoDB
 - Infra: Terraform
-- Deploy: ECS/Fargate + ALB + ACM + Route53 + ECR
+- Deploy: AWS Amplify Hosting (SSR) + Route53
 
 ## Repo Layout
 
@@ -27,7 +27,7 @@ Build time focuses on assembling content and infrastructure artifacts. Runtime f
 - Fetch resume README/PDF from a private GitHub repo via `scripts/fetch-resume.mjs`.
 - Use OpenAI to summarize the resume into `web/src/content/personalization.json`.
 - Generate `web/src/content/resume.md` and `web/public/resume.pdf`.
-- Build the Next.js app and Docker image; CI/CD applies Terraform and deploys to ECS.
+- Build the Next.js app in Amplify; CI/CD applies Terraform to keep infra in sync.
 
 ### Runtime
 
@@ -129,8 +129,16 @@ Builds use the repo root as context so `config/profile.json` is included in the 
 For local runs, set:
 
 - `TF_VAR_domain_name`
-- `TF_VAR_hosted_zone_id`
 - `TF_VAR_admin_token` (or `ADMIN_TOKEN`)
+- `TF_VAR_amplify_repo_url`
+- `TF_VAR_amplify_access_token`
+- `TF_VAR_resume_repo_token`
+- `TF_VAR_resume_repo_owner`
+- `TF_VAR_resume_repo_name`
+- `TF_VAR_resume_repo_readme_path`
+- `TF_VAR_resume_repo_pdf_path`
+- `TF_VAR_resume_repo_ref` (optional)
+- `TF_VAR_openai_api_key`
 
 To set cost-reporting tags and other defaults, copy the example vars file:
 
@@ -169,8 +177,7 @@ separate region.
 GitHub Actions will:
 
 1. Build and test the web app
-2. Build and push the Docker image to ECR
-3. Apply Terraform for deployment
+2. Apply Terraform for deployment
 
 Test runs publish a JUnit summary to the PR checks and discussion via GitHub
 Actions.
@@ -183,7 +190,9 @@ Required GitHub Secrets:
 - `AWS_ACCOUNT_ID`
 - `TF_STATE_REGION` (state backend region, optional if same as `AWS_REGION`)
 - `TF_VAR_domain_name`
-- `TF_VAR_hosted_zone_id`
+- `TF_VAR_amplify_repo_url`
+- `TF_VAR_amplify_access_token`
+- `TF_VAR_amplify_branch` (optional)
 - `TF_VAR_admin_token` (or `ADMIN_TOKEN`)
 - `TF_VAR_project_name` (optional)
 - `TF_VAR_environment` (optional)
@@ -257,4 +266,4 @@ cp .env.example .env
 
 ## Domain & HTTPS
 
-Terraform provisions ACM certs and Route53 records. Supply your hosted zone and domain vars in `infra/`.
+Amplify provisions HTTPS certificates and manages DNS validation. Set `TF_VAR_domain_name` and ensure the domain is in the AWS account’s Route53 to allow automatic verification.

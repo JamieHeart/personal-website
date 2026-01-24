@@ -20,7 +20,7 @@ Build time fetches and summarizes the resume into structured personalization art
 
 - Web stack: Next.js + React + TypeScript.
 - Blog data: DynamoDB with API routes.
-- Deploy target: ECS/Fargate behind ALB with Route53/ACM.
+- Deploy target: AWS Amplify Hosting (SSR) with Route53-managed domain.
 - Personalization: build-time `web/src/content/personalization.json` (generated from resume) is the source of truth; `config/profile.json` provides fallbacks and links.
 - Resume content: fetched from private GitHub repo during CI via `scripts/fetch-resume.mjs`.
 - OpenAI usage: build-time resume summarization to produce personalization data; runtime usage reserved for future API features.
@@ -49,3 +49,4 @@ flowchart TD
 - 2026-01-17: Makefile loads root .env for Terraform variables.
 - 2026-01-17: Added remote Terraform state + import workflow to improve deploy resilience.
 - 2026-01-19: Documented build-time personalization from private resume repo with OpenAI.
+- 2026-01-24: Switched deployment target to AWS Amplify Hosting.
